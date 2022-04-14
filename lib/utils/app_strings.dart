@@ -23,4 +23,14 @@ class Constants{
   static const String strZipCodeHint="Enter zipCode";
   static const String strZipCodeError="Please enter zipcode";
 
+
+  static const String strInstitute="Institute";
+  static const String strInstituteHint="Enter institute";
+  static const String strInstituteError="Please enter institute";
+  static const String strDegree="Degree";
+  static const String strDegreeHint="Enter degree";
+  static const String strDegreeError="Please enter degree";
+  static const String strDate="Date";
+  static const String strDateError="Please enter date";
+  static const String strDateHint="Enter date";
 }

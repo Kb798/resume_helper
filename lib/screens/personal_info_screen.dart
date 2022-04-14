@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:resume_helper/custom_widgets/appbar_widget.dart';
+import 'package:resume_helper/custom_widgets/custom_button.dart';
 import 'package:resume_helper/custom_widgets/textfield_widget.dart';
 import 'package:resume_helper/utils/app_colors.dart';
 import 'package:resume_helper/utils/app_images.dart';
 import 'package:resume_helper/utils/app_strings.dart';
+
+import '../main.dart';
+import 'education_screen.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({Key? key}) : super(key: key);
@@ -217,7 +221,29 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 ],
               ),
             ),
+            CustomButton(
+              title: 'Next',
+              onPressed: () {
+                if (_formKey.currentState!.validate() ) {
+                  if(  myimage!=null){
+                    userResumeModel.firstName =
+                        firstNameController.text.toString();
+                    userResumeModel.lastName = lastNameController.text.toString();
+                    userResumeModel.phone = phoneNumberController.text.toString();
+                    userResumeModel.email = emailController.text.toString();
+                    userResumeModel.address = addressController.text.toString();
+                    userResumeModel.city = cityController.text.toString();
+                    userResumeModel.zipCode = zipcodeController.text.toString();
+                    userResumeModel.image = myimage!.path.toString();
+                    print("USerResumeModel---->" + userResumeModel.toJson().toString());
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => EducationScreen(),));
+                  }else{
+                    showToast(context,"Please select Image");
+                  }
 
+                }
+              },
+            )
           ],
         ),
       ),
