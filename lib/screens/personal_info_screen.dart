@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:resume_helper/custom_widgets/appbar_widget.dart';
+import 'package:resume_helper/custom_widgets/textfield_widget.dart';
 import 'package:resume_helper/utils/app_colors.dart';
 import 'package:resume_helper/utils/app_images.dart';
-
+import 'package:resume_helper/utils/app_strings.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({Key? key}) : super(key: key);
@@ -73,6 +74,149 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.only(top: 15, bottom: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: CustomField(
+                      validator: (String? val) {
+                        if (val == "") {
+                          return Constants.strFNameError;
+                        } else {
+                          return null;
+                        }
+                      },
+                      fieldName: Constants.strFName,
+                      fieldInputType: TextInputType.name,
+                      fieldController: firstNameController,
+                      hint: Constants.strFNameHint,
+                      onTap: () {},
+                    ),
+                  ),
+                  Expanded(flex: 1, child: Container()),
+                  Expanded(
+                    flex: 5,
+                    child: CustomField(
+                      validator: (String? val) {
+                        if (val == "") {
+                          return Constants.strLNameError;
+                        } else {
+                          return null;
+                        }
+                      },
+                      fieldName: Constants.strLName,
+                      fieldController: lastNameController,
+                      fieldInputType: TextInputType.name,
+                      hint: Constants.strLNameHint,
+                      onTap: () {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: CustomField(
+                validator: (String? val) {
+                  if (val == "") {
+                    return Constants.strPhoneError;
+                  } else if (val!.length < 10) {
+                    return "Enter valid phone";
+                  } else {
+                    return null;
+                  }
+                },
+                fieldName: Constants.strPhoneNo,
+                fieldController: phoneNumberController,
+                fieldInputType: TextInputType.phone,
+                maxLength: 10,
+                hint: Constants.strPhoneNo,
+                onTap: () {},
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: CustomField(
+                validator: (String? val) {
+                  if (val == "") {
+                    return Constants.strEmailError;
+                  } else if (validateEmail(val.toString()) == false) {
+                    return "Enter valid email";
+                  } else {
+                    return null;
+                  }
+                },
+                fieldName: Constants.strEmail,
+                fieldController: emailController,
+                fieldInputType: TextInputType.emailAddress,
+                hint: Constants.strEmailHint,
+                onTap: () {},
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: CustomField(
+                validator: (String? val) {
+                  if (val == "") {
+                    return Constants.strAddressError;
+                  } else {
+                    return null;
+                  }
+                },
+                fieldName: Constants.strAddress,
+                fieldController: addressController,
+                fieldInputType: TextInputType.streetAddress,
+                hint: Constants.strAddressHint,
+                onTap: () {},
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: CustomField(
+                      validator: (String? val) {
+                        if (val == "") {
+                          return Constants.strCityError;
+                        } else {
+                          return null;
+                        }
+                      },
+                      fieldName: Constants.strCity,
+                      fieldController: cityController,
+                      fieldInputType: TextInputType.name,
+                      hint: Constants.strCityHint,
+                      onTap: () {},
+                    ),
+                  ),
+                  Expanded(flex: 1, child: Container()),
+                  Expanded(
+                    flex: 5,
+                    child: CustomField(
+                      validator: (String? val) {
+                        if (val == "") {
+                          return Constants.strZipCodeError;
+                        } else if (val!.length < 6) {
+                          return "Enter valid zipCode";
+                        } else {
+                          return null;
+                        }
+                      },
+                      fieldName: Constants.strZipCode,
+                      fieldController: zipcodeController,
+                      maxLength: 6,
+                      fieldInputType: TextInputType.number,
+                      hint: Constants.strZipCodeHint,
+                      onTap: () {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
           ],
         ),
@@ -94,12 +238,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     }
   }
 
-
   bool validateEmail(String value) {
     String pattern1 =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = RegExp(pattern1);
     return (!regex.hasMatch(value)) ? false : true;
   }
-
 }
