@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -7,9 +8,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:resume_helper/custom_widgets/appbar_widget.dart';
 import 'package:resume_helper/custom_widgets/custom_button.dart';
 import 'package:resume_helper/custom_widgets/textfield_widget.dart';
+import 'package:resume_helper/model/user_resume_model.dart';
 import 'package:resume_helper/utils/app_colors.dart';
 import 'package:resume_helper/utils/app_images.dart';
 import 'package:resume_helper/utils/app_strings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 import 'education_screen.dart';
@@ -29,8 +32,39 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   TextEditingController addressController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController zipcodeController = TextEditingController();
+  List<TextEditingController> listSkillController = [];
+  List<String> listExperienceLevel = [];
+  List<String> skillLevel = ['Beginner', 'Skillful', 'Experienced', 'Expert'];
   File? myimage;
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    listSkillController.add(TextEditingController());
+    listExperienceLevel.add(skillLevel[0]);
+    getSkills();
+  }
+
+  getSkills() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String? jsonSkillList = pref.getString('SkillList');
+    print("SkillList ------->" + jsonSkillList.toString());
+    if (jsonSkillList != null && jsonSkillList.isNotEmpty) {
+      List<Skill> getListSkills = List<Skill>.from(
+          json.decode(jsonSkillList).map((x) => Skill.fromJson(x)));
+      for (int a = 0; a < getListSkills.length; a++) {
+        if (getListSkills.length > listSkillController.length) {
+          listSkillController.add(TextEditingController());
+          listExperienceLevel.add(skillLevel[0]);
+        }
+        setState(() {
+          listSkillController[a].text = getListSkills[a].skill.toString();
+          listExperienceLevel.add(getListSkills[a].level.toString());
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -221,32 +255,135 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 ],
               ),
             ),
+            ListView.separated(
+              separatorBuilder: (context, index) => Container(
+                height: 10,
+              ),
+              itemCount: listSkillController.length,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) => Container(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: CustomField(
+                        validator: (String? val) {
+                          if (val == "") {
+                            return Constants.strSkillError;
+                          } else {
+                            return null;
+                          }
+                        },
+                        fieldName: Constants.strSkill,
+                        fieldController: listSkillController[index],
+                        hint: Constants.strSkillHint,
+                        onTap: () {},
+                      ),
+                    ),
+                    _buildDropDown(index),
+                  ],
+                ),
+              ),
+            ),
             CustomButton(
               title: 'Next',
               onPressed: () {
-                if (_formKey.currentState!.validate() ) {
-                  if(  myimage!=null){
+                if (_formKey.currentState!.validate()) {
+                  if (myimage != null) {
                     userResumeModel.firstName =
                         firstNameController.text.toString();
-                    userResumeModel.lastName = lastNameController.text.toString();
-                    userResumeModel.phone = phoneNumberController.text.toString();
+                    userResumeModel.lastName =
+                        lastNameController.text.toString();
+                    userResumeModel.phone =
+                        phoneNumberController.text.toString();
                     userResumeModel.email = emailController.text.toString();
                     userResumeModel.address = addressController.text.toString();
                     userResumeModel.city = cityController.text.toString();
                     userResumeModel.zipCode = zipcodeController.text.toString();
                     userResumeModel.image = myimage!.path.toString();
-                    print("USerResumeModel---->" + userResumeModel.toJson().toString());
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => EducationScreen(),));
-                  }else{
-                    showToast(context,"Please select Image");
+                    print("USerResumeModel---->" +
+                        userResumeModel.toJson().toString());
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EducationScreen(),
+                        ));
+                  } else {
+                    showToast(context, "Please select Image");
                   }
-
                 }
               },
             )
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.clrWhite,
+        onPressed: () async {
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          List<Skill> listSkills = [];
+          setState(() {
+            listSkillController.add(TextEditingController());
+            listExperienceLevel.add(skillLevel[0]);
+            for (int a = 0; a < listSkillController.length; a++) {
+              listSkills.add(Skill(
+                  skill: listSkillController[a].text,
+                  level: listExperienceLevel[a]));
+            }
+            pref.setString('SkillList',
+                json.encode(List<Skill>.from(listSkills.map((e) => e))));
+            String? jsonSkillList = pref.getString('SkillList');
+            print("SkillList ------->" + jsonSkillList.toString());
+            if (jsonSkillList != null && jsonSkillList.isNotEmpty) {
+              List<Skill> getListSkills = List<Skill>.from(
+                  json.decode(jsonSkillList).map((x) => Skill.fromJson(x)));
+              getListSkills.forEach((element) {
+                print("Skills--->" + element.toJson().toString());
+              });
+            }
+          });
+        },
+        child: Icon(
+          Icons.add,
+          size: 45,
+          color: AppColors.clrMain,
+        ),
+      ),
+    );
+  }
+
+  _buildDropDown(int index) {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.clrMain)),
+      margin: EdgeInsets.only(bottom: 20),
+      child: DropdownButton<String>(
+          borderRadius: BorderRadius.circular(12),
+          isExpanded: true,
+          underline: const SizedBox(),
+          icon: const SizedBox(),
+          value: listExperienceLevel[index],
+          items: skillLevel.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: Text(
+                  value,
+                  // style: TextStyle(
+                  //     color: AppConstants.clrWhite),
+                ),
+              ),
+            );
+          }).toList(),
+          onTap: () {},
+          onChanged: (val) {
+            setState(() {
+              listExperienceLevel[index] = val.toString();
+            });
+          }),
     );
   }
 

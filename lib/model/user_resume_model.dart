@@ -63,7 +63,6 @@ class Skill {
   });
 
   String? skill;
-
   String? level;
 
   factory Skill.fromJson(Map<String, dynamic> json) =>

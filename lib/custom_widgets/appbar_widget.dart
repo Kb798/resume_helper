@@ -7,7 +7,6 @@ import 'package:resume_helper/utils/app_colors.dart';
     backgroundColor: AppColors.clrMain,
     centerTitle: true,
     title: Text(title,style: const TextStyle( fontWeight: FontWeight.bold,color: AppColors.clrWhite),),
-
   );
 }
 void showToast(BuildContext context,String text) {
